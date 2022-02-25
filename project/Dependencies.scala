@@ -6,5 +6,5 @@ object Dependencies {
   val SlickVersion  = "3.3.3"
 
   lazy val akka   = "com.typesafe.akka"   %% "akka-stream"  % AkkaVersion
-  lazy val slick  = "com.typesafe.slick"  %% "slick"        % "3.3.3"
+  lazy val slick  = "com.typesafe.slick"  %% "slick"        % SlickVersion
 }

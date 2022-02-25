@@ -14,6 +14,7 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0
 libraryDependencies ++= Seq(
   akka,
   slick,
+  ws,
 )
 
 // Adds additional packages into Twirl
