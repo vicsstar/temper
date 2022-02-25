@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  postgres-server:
+    image: postgres:14-alpine
+    container_name: temper
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_DB=temper
+    ports:
+      - "5431:5432"
