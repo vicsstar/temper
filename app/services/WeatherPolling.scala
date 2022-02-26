@@ -31,12 +31,12 @@ class WeatherPolling @Inject() (
 
       Source
         .fromIterator(() => locations.iterator)
-        .via(processSingleLocation())
+        .via(getWeatherInfoForSingleLocation)
         .via(saveWeatherInfo())
         .runWith(Sink.ignore)
   }
 
-  private def processSingleLocation(): Flow[LocationLimit, WeatherInfo, NotUsed] =
+  def getWeatherInfoForSingleLocation: Flow[LocationLimit, WeatherInfo, NotUsed] =
     Flow[LocationLimit].flatMapConcat(loc =>
       Source.futureSource(
         pollingService
@@ -45,6 +45,6 @@ class WeatherPolling @Inject() (
       )
     )
 
-  private def saveWeatherInfo(): Flow[WeatherInfo, WeatherInfo, NotUsed] =
+  def saveWeatherInfo(): Flow[WeatherInfo, WeatherInfo, NotUsed] =
     Flow[WeatherInfo].mapAsync(1)(weatherInfo => Future.successful(weatherInfo))
 }

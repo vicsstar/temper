@@ -12,7 +12,7 @@ trait BaseWeatherConfigHelper {
       _.split(',').toList match {
         case List(location, temperature) =>
           temperature.toDoubleOption.map(LocationLimit(location, _))
-        case Nil => None
+        case _ => None
       }
     }
 }
