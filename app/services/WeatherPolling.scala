@@ -29,11 +29,13 @@ class WeatherPolling @Inject() (
   override def receive: Receive = {
     case PollService =>
 
+      println("Polling Started")
+
       Source
         .fromIterator(() => locations.iterator)
         .via(getWeatherInfoForSingleLocation)
         .via(saveWeatherInfo())
-        .runWith(Sink.ignore)
+        .runWith(Sink.foreach(Console.println))
   }
 
   def getWeatherInfoForSingleLocation: Flow[LocationLimit, WeatherInfo, NotUsed] =

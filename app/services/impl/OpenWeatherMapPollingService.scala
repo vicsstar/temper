@@ -4,6 +4,7 @@ import models.WeatherInfo
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 import services.{BaseWeatherConfigHelper, WeatherPolling}
+import utils.AnyOps
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,10 +15,15 @@ class OpenWeatherMapPollingService @Inject() (val config: Configuration, val ws:
   extends WeatherPolling.Service with OpenWeatherMapConfigHelper with OpenWeatherMapFunctions {
 
   override def getWeatherInfo(location: String): Future[List[WeatherInfo]] = {
-    for {
+    (for {
       geo       <- getGeolocation(location)
       forecast  <- getForecast(geo)
-    } yield forecast
+    } yield forecast.map(_.copy(location = location.?)))
+      .recoverWith {
+        case th =>
+          th.printStackTrace()
+          Future.successful(Nil)
+      }
   }
 }
 

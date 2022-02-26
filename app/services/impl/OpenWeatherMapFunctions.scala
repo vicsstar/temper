@@ -1,6 +1,9 @@
 package services.impl
 
 import models.WeatherInfo
+import org.joda.time.LocalDate
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsArray, JsValue, __}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,36 +27,48 @@ trait OpenWeatherMapFunctions {
       )
       .get()
       .map { response =>
-        val json = response.json
-        ((json \ "lat").as[BigDecimal], (json \ "lon").as[BigDecimal])
+        val geoLocationReads = (
+          (__ \ "lat").read[BigDecimal] and
+          (__ \ "lon").read[BigDecimal]
+        )(Tuple2.apply[BigDecimal, BigDecimal] _)
+
+        response.json.as[JsArray].head.get.as[GeoLocation](geoLocationReads)
       }
   }
 
   protected def getForecast(geoLocation: GeoLocation): Future[List[WeatherInfo]] = {
-    geoLocation match {
-      case (latitude, longitude) =>
-        ws.url(getForecastURL)
-          .withRequestTimeout(10000.millis)
-          .withQueryStringParameters(
-            Param.Lat   -> latitude.toString,
-            Param.Lon   -> longitude.toString,
-            Param.AppID -> apiKey,
-            Param.Units -> "metric",
-          )
-          .get()
-          .map { response =>
-            val results = response.json \\ "list"
+    val (latitude, longitude) = geoLocation
 
-            results.map(oneRecord => {
-              val temp  = (oneRecord \ "main" \ "temp").as[BigDecimal]
-              val dtTxt = (oneRecord \ "dt_txt").as[String].split(' ').head
-              (temp, dtTxt)
-            }).groupBy(_._2)
-              .map { case (_, (temp, dtTxt) :: _) =>
-                WeatherInfo.temp(temp, java.time.Instant.parse(dtTxt))
-              }
-              .toList
+    ws.url(getForecastURL)
+      .withRequestTimeout(10000.millis)
+      .withQueryStringParameters(
+        Param.Lat   -> latitude.toString,
+        Param.Lon   -> longitude.toString,
+        Param.AppID -> apiKey,
+        Param.Units -> "metric",
+      )
+      .get()
+      .map { response =>
+        val results   = (response.json \ "list").as[List[JsValue]]
+
+        results.map { oneRecord =>
+          val tempReader  = (__ \ "main" \ "temp").read[BigDecimal]
+          val dtTxtReader = (__ \ "dt_txt")
+            .read[String]
+            .map(_.split(' ').head)
+            .map(LocalDate.parse)
+            .map(_.toDate.toInstant)
+
+          implicit val weatherInfoReader = (
+            tempReader and dtTxtReader
+          )((temp, date) => WeatherInfo.temp(temp, date))
+
+          oneRecord.as[WeatherInfo]
+        }.groupBy(_.date)
+          .flatMap {
+            case (_, weatherInfoList) => weatherInfoList.headOption
           }
-    }
+          .toList
+      }
   }
 }
