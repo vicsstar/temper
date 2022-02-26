@@ -3,7 +3,7 @@ package services.impl
 import models.WeatherInfo
 import play.api.Configuration
 import play.api.libs.ws.WSClient
-import services.{BaseWeatherConfigHelper, WeatherPollingService}
+import services.{BaseWeatherConfigHelper, WeatherPolling}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -11,13 +11,13 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class OpenWeatherMapPollingService @Inject() (val config: Configuration, val ws: WSClient)
                                              (implicit val ec: ExecutionContext)
-  extends WeatherPollingService with OpenWeatherMapConfigHelper with OpenWeatherMapFunctions {
+  extends WeatherPolling.Service with OpenWeatherMapConfigHelper with OpenWeatherMapFunctions {
 
   override def getWeatherInfo(location: String): Future[List[WeatherInfo]] = {
     for {
       geo       <- getGeolocation(location)
       forecast  <- getForecast(geo)
-    } yield forecast.toList
+    } yield forecast
   }
 }
 
