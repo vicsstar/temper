@@ -3,7 +3,7 @@ package services.impl
 import models.WeatherInfo
 import org.joda.time.LocalDate
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsArray, JsValue, __}
+import play.api.libs.json.{JsValue, __}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +32,7 @@ trait OpenWeatherMapFunctions {
           (__ \ "lon").read[BigDecimal]
         )(Tuple2.apply[BigDecimal, BigDecimal] _)
 
-        response.json.as[JsArray].head.get.as[GeoLocation](geoLocationReads)
+        response.json.as[List[JsValue]].head.as[GeoLocation](geoLocationReads)
       }
   }
 

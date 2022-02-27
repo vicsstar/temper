@@ -29,8 +29,6 @@ class WeatherPolling @Inject() (
   override def receive: Receive = {
     case PollService =>
 
-      println("Polling Started")
-
       Source
         .fromIterator(() => locations.iterator)
         .via(getWeatherInfoForSingleLocation)

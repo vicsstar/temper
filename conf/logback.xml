@@ -36,6 +36,9 @@
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />
+  </root>
+
+  <root level="INFO">
     <appender-ref ref="ASYNCSTDOUT" />
   </root>
 

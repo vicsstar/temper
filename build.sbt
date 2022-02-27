@@ -10,12 +10,16 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := "2.13.8"
 
 libraryDependencies += guice
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
+libraryDependencies += jdbc
 libraryDependencies ++= Seq(
   akka,
   slick,
   ws,
+  postgres,
+  flywayPlay,
 )
+
+libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.vicigbokwe.temper.controllers._"
