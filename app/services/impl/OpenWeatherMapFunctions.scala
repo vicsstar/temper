@@ -61,7 +61,7 @@ trait OpenWeatherMapFunctions {
 
           implicit val weatherInfoReader = (
             tempReader and dtTxtReader
-          )((temp, date) => WeatherInfo.temp(temp, date))
+          )((temp, date) => WeatherInfo(temp, date, None, None, None))
 
           oneRecord.as[WeatherInfo]
         }.groupBy(_.date)
