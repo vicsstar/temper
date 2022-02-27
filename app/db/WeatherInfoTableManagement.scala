@@ -11,7 +11,7 @@ trait WeatherInfoTableManagement {
 
   import profile.api._
 
-  val weatherInfo = TableQuery[WeatherInfo]
+  val weatherInfo = TableQuery[WeatherInfoTable]
 
   class WeatherInfoTable(tag: Tag) extends Table[WeatherInfo](tag, "weather_info") {
     def temp = column[BigDecimal]("temp")
