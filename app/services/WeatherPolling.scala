@@ -34,22 +34,31 @@ class WeatherPolling @Inject() (
       Source
         .fromIterator(() => locations.iterator)
         .via(getWeatherInfoForSingleLocation)
+        .via(filterByLocationLimit())
+        .map(_._1)
         .via(saveWeatherInfo())
-        .runWith(Sink.foreach(Console.println))
+        .runWith(Sink.foreach(Console.println)) // not interested in doing anything with the result here
         .recover { th =>
           th.printStackTrace()
         }
   }
 
-  def getWeatherInfoForSingleLocation: Flow[LocationLimit, WeatherInfo, NotUsed] =
+  type WeatherLimitPair = (WeatherInfo, LocationLimit)
+
+  def getWeatherInfoForSingleLocation: Flow[LocationLimit, WeatherLimitPair, NotUsed] =
     Flow[LocationLimit].flatMapConcat(loc =>
       Source.futureSource(
         pollingService
           .getWeatherInfo(loc.location)
-          .map(loc2 => Source.fromIterator(() => loc2.iterator))
+          .map(loc2 => Source.fromIterator(() => loc2.map(_ -> loc).iterator))
       )
     )
 
-  def saveWeatherInfo(): Flow[WeatherInfo, Long, NotUsed] =
+  def filterByLocationLimit(): Flow[WeatherLimitPair, WeatherLimitPair, NotUsed] =
+    Flow[WeatherLimitPair].filter {
+      case (info, limit) => info.temp >= limit.limit
+    }
+
+  def saveWeatherInfo(): Flow[WeatherInfo, Int, NotUsed] =
     Flow[WeatherInfo].mapAsync(1)(weatherDbComponent.create)
 }

@@ -11,7 +11,7 @@ trait WeatherInfoTableManagement {
 
   import profile.api._
 
-  val weatherInfo = TableQuery[WeatherInfoTable]
+  val WeatherTable = TableQuery[WeatherInfoTable]
 
   class WeatherInfoTable(tag: Tag) extends Table[WeatherInfo](tag, "weather_info") {
     def temp = column[BigDecimal]("temp")
@@ -20,8 +20,6 @@ trait WeatherInfoTableManagement {
     def created = column[Option[Instant]]("created")
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
-    override def * = (temp, date, location.?, created, id.?) <> ( {
-      case (temp, date, location, created, id) => WeatherInfo(temp, date, location, created, id)
-    }, WeatherInfo.unapply)
+    override def * = (temp, date, location.?, created, id.?) <> ((WeatherInfo.apply _).tupled, WeatherInfo.unapply)
   }
 }

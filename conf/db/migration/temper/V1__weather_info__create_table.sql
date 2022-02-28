@@ -7,5 +7,6 @@ CREATE TABLE weather_info(
     "date"      TIMESTAMP NOT NULL,
     "temp"      NUMERIC NOT NULL,
     "location"  TEXT NOT NULL,
-    "created"   TIMESTAMP DEFAULT now()
+    "created"   TIMESTAMP DEFAULT now(),
+    UNIQUE (location, date)
 );
