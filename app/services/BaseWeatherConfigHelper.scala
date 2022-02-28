@@ -3,6 +3,8 @@ package services
 import models.LocationLimit
 import play.api.Configuration
 
+import scala.concurrent.duration.FiniteDuration
+
 trait BaseWeatherConfigHelper {
   val config: Configuration
 
@@ -15,4 +17,6 @@ trait BaseWeatherConfigHelper {
         case _ => None
       }
     }
+
+  lazy val pollingInterval = config.get[FiniteDuration]("weather_service.polling_interval")
 }

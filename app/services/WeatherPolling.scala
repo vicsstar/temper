@@ -3,6 +3,7 @@ package services
 import akka.NotUsed
 import akka.actor.{Actor, ActorSystem}
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import db.WeatherInfoDatabaseComponent
 import models.{LocationLimit, WeatherInfo}
 import play.api.Configuration
 import services.WeatherPolling.PollService
@@ -22,7 +23,8 @@ object WeatherPolling {
 @Singleton
 class WeatherPolling @Inject() (
                                  val config: Configuration,
-                                 pollingService: WeatherPolling.Service
+                                 pollingService: WeatherPolling.Service,
+                                 weatherDbComponent: WeatherInfoDatabaseComponent,
                                )(implicit ec: ExecutionContext, actorSystem: ActorSystem)
   extends Actor with BaseWeatherConfigHelper {
 
@@ -34,6 +36,9 @@ class WeatherPolling @Inject() (
         .via(getWeatherInfoForSingleLocation)
         .via(saveWeatherInfo())
         .runWith(Sink.foreach(Console.println))
+        .recover { th =>
+          th.printStackTrace()
+        }
   }
 
   def getWeatherInfoForSingleLocation: Flow[LocationLimit, WeatherInfo, NotUsed] =
@@ -45,6 +50,6 @@ class WeatherPolling @Inject() (
       )
     )
 
-  def saveWeatherInfo(): Flow[WeatherInfo, WeatherInfo, NotUsed] =
-    Flow[WeatherInfo].mapAsync(1)(weatherInfo => Future.successful(weatherInfo))
+  def saveWeatherInfo(): Flow[WeatherInfo, Long, NotUsed] =
+    Flow[WeatherInfo].mapAsync(1)(weatherDbComponent.create)
 }

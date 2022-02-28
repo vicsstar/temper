@@ -1,8 +1,9 @@
 import com.google.inject.AbstractModule
-import controllers.WeatherPollingScheduler
+import db.DatabaseComponent
 import play.api.libs.concurrent.AkkaGuiceSupport
-import services.WeatherPolling
 import services.impl.OpenWeatherMapPollingService
+import services.{WeatherPolling, WeatherPollingScheduler}
+import slick.jdbc.JdbcBackend.Database
 
 class Module extends AbstractModule with AkkaGuiceSupport {
 
@@ -10,5 +11,8 @@ class Module extends AbstractModule with AkkaGuiceSupport {
     bindActor[WeatherPolling]("weather-polling-service")
     bind(classOf[WeatherPolling.Service]).to(classOf[OpenWeatherMapPollingService])
     bind(classOf[WeatherPollingScheduler]).asEagerSingleton()
+
+    bind(classOf[Database]).toInstance(Database.forConfig("temper"))
+    bind(classOf[DatabaseComponent]).asEagerSingleton()
   }
 }

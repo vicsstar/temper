@@ -1,7 +1,6 @@
 package services.impl
 
 import models.WeatherInfo
-import org.joda.time.LocalDate
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsValue, __}
 
@@ -51,20 +50,9 @@ trait OpenWeatherMapFunctions {
       .map { response =>
         val results   = (response.json \ "list").as[List[JsValue]]
 
-        results.map { oneRecord =>
-          val tempReader  = (__ \ "main" \ "temp").read[BigDecimal]
-          val dtTxtReader = (__ \ "dt_txt")
-            .read[String]
-            .map(_.split(' ').head)
-            .map(LocalDate.parse)
-            .map(_.toDate.toInstant)
-
-          implicit val weatherInfoReader = (
-            tempReader and dtTxtReader
-          )((temp, date) => WeatherInfo(temp, date, None, None, None))
-
-          oneRecord.as[WeatherInfo]
-        }.groupBy(_.date)
+        results
+          .map(_.as[WeatherInfo])
+          .groupBy(_.date)
           .flatMap {
             case (_, weatherInfoList) => weatherInfoList.headOption
           }

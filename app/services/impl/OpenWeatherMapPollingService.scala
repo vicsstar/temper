@@ -6,6 +6,7 @@ import play.api.libs.ws.WSClient
 import services.{BaseWeatherConfigHelper, WeatherPolling}
 import utils.{AnyOps, HasLogger}
 
+import java.time.Instant
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -29,7 +30,7 @@ class OpenWeatherMapPollingService @Inject() (val config: Configuration, val ws:
 
 trait OpenWeatherMapConfigHelper extends BaseWeatherConfigHelper {
 
-  lazy val owmConfig  = config.get[Configuration]("weather_api.openweathermap")
+  lazy val owmConfig  = config.get[Configuration]("weather_service.openweathermap")
   lazy val apiKey     = owmConfig.get[String]("api_key")
 
   val getGeocodingURL = "https://api.openweathermap.org/geo/1.0/direct"

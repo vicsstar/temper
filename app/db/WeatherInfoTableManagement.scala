@@ -18,8 +18,10 @@ trait WeatherInfoTableManagement {
     def date = column[Instant]("date")
     def location = column[String]("location")
     def created = column[Option[Instant]]("created")
-    def id = column[Long]("created", O.PrimaryKey, O.AutoInc)
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
-    override def * = (temp, date, location.?, created, id.?).mapTo[WeatherInfo]
+    override def * = (temp, date, location.?, created, id.?) <> ( {
+      case (temp, date, location, created, id) => WeatherInfo(temp, date, location, created, id)
+    }, WeatherInfo.unapply)
   }
 }
