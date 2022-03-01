@@ -43,7 +43,6 @@ class WeatherPollingTest extends AnyFunSuite with GuiceOneAppPerTest with Inject
     // upstream pushes data
     pub.sendNext(LocationLimit("lagos", 20.5))
 
-    // find associated variations
     sub.expectNext(weatherInfoList.last -> LocationLimit("lagos", 20.5))
 
     succeed
