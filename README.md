@@ -9,7 +9,7 @@
 
 This program was tested on systems running Java 8 and 11.
 
-### Running the service
+### Running the database service
 Create a `.env` file in the project's root directory, containing the following keys for database access:
 
 ```
