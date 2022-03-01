@@ -32,3 +32,14 @@ _(to prevent clash with any existing database service running on the standard 54
 Simply execute at the terminal, the command: `sbt test`.
 
 _Note: the application uses Flyway migrations so, you should have a valid database instance running to successfully run the tests._
+
+### Accessing the service
+To start the service, run `sbt runProd`, to run it in production mode, so the polling service start automatically. 
+
+When the service starts successfully, there is a single endpoint that exposes the forecast data stored in the database.
+
+It should be accessible on your local machine at: http://127.0.0.1:9000/forecast
+
+In the case there is a clash with another port on your local machine, you can start the service on a port of your choice:
+
+`sbt "runProd <port>"`

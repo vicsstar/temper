@@ -9,14 +9,14 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.test.Injecting
-import utils.MockHelpers
+import utils.{MockHelpers, TestHelpers}
 
 import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
-class WeatherPollingTest extends AnyFunSuite with GuiceOneAppPerTest with Injecting with MockFactory with MockHelpers {
-
-  implicit lazy val actorSystem: ActorSystem = app.actorSystem
+class WeatherPollingTest extends AnyFunSuite
+  with GuiceOneAppPerTest with Injecting with MockFactory with MockHelpers with TestHelpers {
+  thisSuite =>
 
   test("testGetWeatherInfoForSingleLocation") {
     val weatherPollingService = mock[WeatherPolling.Service]
@@ -24,7 +24,7 @@ class WeatherPollingTest extends AnyFunSuite with GuiceOneAppPerTest with Inject
     val weatherPolling = new WeatherPollingFunctions {
       override val pollingService: WeatherPolling.Service = weatherPollingService
       override lazy val weatherDbComponent: WeatherInfoDatabaseComponent = ???
-      override implicit val ec: ExecutionContext = actorSystem.dispatcher
+      override implicit val ec: ExecutionContext = thisSuite.ec
     }
 
     (weatherPollingService.getWeatherInfo _)

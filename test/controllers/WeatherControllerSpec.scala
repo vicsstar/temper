@@ -6,7 +6,7 @@ import org.scalatestplus.play.guice._
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
-import utils.MockHelpers
+import utils.{MockHelpers, TestHelpers}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -17,9 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
  */
 class WeatherControllerSpec extends PlaySpec
-  with GuiceOneAppPerTest with MockFactory with MockHelpers {
-
-  implicit lazy val ec: ExecutionContext = app.actorSystem.dispatcher
+  with GuiceOneAppPerTest with MockFactory with MockHelpers with TestHelpers {
 
   "WeatherController GET /forecast" should {
 
