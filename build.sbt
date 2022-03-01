@@ -20,7 +20,11 @@ libraryDependencies ++= Seq(
   slickHikari,
 )
 
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play"  %% "scalatestplus-play"   % "5.1.0"   % Test,
+  "org.scalamock"           %% "scalamock"            % "5.2.0"   % Test,
+  "com.typesafe.akka"       %% "akka-stream-testkit"  % "2.6.18"  % Test,
+)
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.vicigbokwe.temper.controllers._"

@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule
-import db.DatabaseComponent
+import db.{DatabaseComponent, WeatherInfoDatabaseComponent, WeatherInfoSlickService}
 import play.api.libs.concurrent.AkkaGuiceSupport
 import services.impl.OpenWeatherMapPollingService
 import services.{WeatherPolling, WeatherPollingScheduler}
@@ -14,5 +14,7 @@ class Module extends AbstractModule with AkkaGuiceSupport {
 
     bind(classOf[Database]).toInstance(Database.forConfig("temper"))
     bind(classOf[DatabaseComponent]).asEagerSingleton()
+
+    bind(classOf[WeatherInfoSlickService]).to(classOf[WeatherInfoDatabaseComponent]).asEagerSingleton()
   }
 }

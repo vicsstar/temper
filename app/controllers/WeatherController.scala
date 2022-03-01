@@ -1,6 +1,6 @@
 package controllers
 
-import db.WeatherInfoDatabaseComponent
+import db.WeatherInfoSlickService
 import play.api.libs.json.Json
 import play.api.mvc._
 
@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class WeatherController @Inject()(
                                    val controllerComponents: ControllerComponents,
-                                   weatherDbComponent: WeatherInfoDatabaseComponent,
+                                   weatherDbComponent: WeatherInfoSlickService,
                                  )(implicit ec: ExecutionContext) extends BaseController {
 
   /**
@@ -24,7 +24,7 @@ class WeatherController @Inject()(
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def fiveDayLimitForecast(days: Int) = Action.async { implicit request: Request[AnyContent] =>
+  def dayForecast(days: Int) = Action.async { implicit request =>
     weatherDbComponent
       .findByTempForecast(days)
       .map(infoList =>

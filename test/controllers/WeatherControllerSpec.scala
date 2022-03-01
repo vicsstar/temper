@@ -1,9 +1,14 @@
 package controllers
 
+import org.scalamock.scalatest.MockFactory
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
-import play.api.test._
+import play.api.libs.json.Json
 import play.api.test.Helpers._
+import play.api.test._
+import utils.MockHelpers
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Add your spec here.
@@ -11,35 +16,24 @@ import play.api.test.Helpers._
  *
  * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
  */
-class WeatherControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+class WeatherControllerSpec extends PlaySpec
+  with GuiceOneAppPerTest with MockFactory with MockHelpers {
 
-  "WeatherController GET" should {
+  implicit lazy val ec: ExecutionContext = app.actorSystem.dispatcher
 
-    "render the index page from a new instance of controller" in {
-      val controller = new WeatherController(stubControllerComponents())
-      val home = controller.index().apply(FakeRequest(GET, "/"))
+  "WeatherController GET /forecast" should {
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
-    }
+    (stubWeatherDbComponent.findByTempForecast _)
+      .expects(5)
+      .returning(Future.successful(weatherInfoList))
 
-    "render the index page from the application" in {
-      val controller = inject[WeatherController]
-      val home = controller.index().apply(FakeRequest(GET, "/"))
+    "render forecast content" in {
+      val controller = new WeatherController(stubControllerComponents(), stubWeatherDbComponent)
+      val forecastPage = controller.dayForecast(5).apply(FakeRequest(GET, "/forecast"))
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
-    }
-
-    "render the index page from the router" in {
-      val request = FakeRequest(GET, "/")
-      val home = route(app, request).get
-
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+      status(forecastPage) mustBe OK
+      contentType(forecastPage) mustBe Some(JSON)
+      contentAsJson(forecastPage) must be (Json.toJson(weatherInfoList))
     }
   }
 }

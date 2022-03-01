@@ -23,10 +23,10 @@ object WeatherPolling {
 @Singleton
 class WeatherPolling @Inject() (
                                  val config: Configuration,
-                                 pollingService: WeatherPolling.Service,
-                                 weatherDbComponent: WeatherInfoDatabaseComponent,
-                               )(implicit ec: ExecutionContext, actorSystem: ActorSystem)
-  extends Actor with BaseWeatherConfigHelper {
+                                 val pollingService: WeatherPolling.Service,
+                                 val weatherDbComponent: WeatherInfoDatabaseComponent,
+                               )(implicit val ec: ExecutionContext, actorSystem: ActorSystem)
+  extends Actor with BaseWeatherConfigHelper with WeatherPollingFunctions {
 
   override def receive: Receive = {
     case PollService =>
@@ -42,8 +42,14 @@ class WeatherPolling @Inject() (
           th.printStackTrace()
         }
   }
+}
 
+trait WeatherPollingFunctions {
   type WeatherLimitPair = (WeatherInfo, LocationLimit)
+
+  val pollingService: WeatherPolling.Service
+  val weatherDbComponent: WeatherInfoDatabaseComponent
+  implicit val ec: ExecutionContext
 
   def getWeatherInfoForSingleLocation: Flow[LocationLimit, WeatherLimitPair, NotUsed] =
     Flow[LocationLimit].flatMapConcat(loc =>
