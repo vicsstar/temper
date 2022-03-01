@@ -31,4 +31,4 @@ _(to prevent clash with any existing database service running on the standard 54
 ### Running the tests
 Simply execute at the terminal, the command: `sbt test`.
 
-_Please note that no attempts were made to dissociate the database from the tests, so all tests will only successfully execute, if a valid database instance is running (for the Flyway migrations)._
+_Note: the application uses Flyway migrations so, you should have a valid database instance running to successfully run the tests._
